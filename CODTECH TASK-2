@@ -1,0 +1,70 @@
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+# Function to generate synthetic data for demonstration
+def generate_data():
+    X, y = make_classification(n_samples=1000, n_features=20, random_state=42)
+    return X, y
+
+# Function to train and evaluate models
+def evaluate_models(X_train, X_test, y_train, y_test, model_names, models):
+    results = {}
+
+    for name, model in zip(model_names, models):
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        precision = precision_score(y_test, y_pred)
+        recall = recall_score(y_test, y_pred)
+        f1 = f1_score(y_test, y_pred)
+
+        results[name] = {
+            'Accuracy': accuracy,
+            'Precision': precision,
+            'Recall': recall,
+            'F1 Score': f1
+        }
+
+    return results
+
+def get_model_parameters():
+    model_names = []
+    models = []
+    
+    while True:
+        model_name = input("Enter model name (or type 'done' to finish): ")
+        if model_name.lower() == 'done':
+            break
+        if model_name == 'Logistic Regression':
+            model = LogisticRegression()
+        elif model_name == 'Decision Tree':
+            model = DecisionTreeClassifier()
+        elif model_name == 'Random Forest':
+            model = RandomForestClassifier()
+        else:
+            print(f"Model '{model_name}' not recognized. Skipping...")
+            continue
+        
+        model_names.append(model_name)
+        models.append(model)
+    return model_names, models
+
+def main():
+    X, y = generate_data()
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    print("Enter model names to evaluate (e.g., 'Logistic Regression', 'Decision Tree', 'Random Forest')")
+    model_names, models = get_model_parameters()
+    results = evaluate_models(X_train, X_test, y_train, y_test, model_names, models)
+
+    print("\nEvaluation Results:")
+    for name, result in results.items():
+        print(f"\n{name}:")
+        for metric, value in result.items():
+            print(f"{metric}: {value}")
+
+if __name__ == "__main__":
+    main()
